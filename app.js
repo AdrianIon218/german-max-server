@@ -16,6 +16,10 @@ require("dotenv").config();
 app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use("/",(req, res) => {
+    res.end("Hei");
+})
 app.use("/login", login);
 app.use("/course_modules", course_router);
 app.get("/courses_available", course_ctrl.courses_available);
