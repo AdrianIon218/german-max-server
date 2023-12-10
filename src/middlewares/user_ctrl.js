@@ -23,25 +23,6 @@ module.exports.areUserCredentialsValid = (req, res) => {
     console.log(err);
     res.json({ status: "ERROR" });
   });
-  /*
-  db_mysql
-    .execute("SELECT password, last_level FROM user WHERE email = ?", [email])
-    .then(async ([users]) => {
-      if (users.length === 0) {
-        res.json({ status: "NO_USER" });
-      } else {
-        if (await bcrypt.compare(password, users[0].password)) {
-          res.json({ status: "USER_OK", lastLevel: users[0].last_level });
-        } else {
-          res.json({ status: "PASS_INCORECT" });
-        }
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-      res.json({ status: "ERROR" });
-    });
-    */
 };
 
 module.exports.isEmailInUse = (req, res) => {
