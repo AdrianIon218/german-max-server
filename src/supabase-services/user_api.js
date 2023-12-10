@@ -9,7 +9,7 @@ module.exports.selectUserByEmail = async function(emailSearch){
     return user;
 }
 
-module.exports.insertUser = async function inserUser(email, password, name, lastLevel){
+module.exports.insertUser = async function(email, password, name, lastLevel){
     const { data, error } = await supabase
     .from('user')
     .insert([
