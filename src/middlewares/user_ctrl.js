@@ -3,10 +3,27 @@ const db_mysql = require("../util/database_msql");
 const bcrypt = require("bcrypt");
 const sendMailWithCode = require("../util/send_mail");
 const { generateCode } = require("../util/simple_functions");
+const { selectUserByEmail, insertUser } = require("../supabase-services/user_api");
 
 module.exports.areUserCredentialsValid = (req, res) => {
   const { email, password } = req.body;
 
+  selectUserByEmail(email).then(async (users)=>{
+    if (users.length === 0) {
+      res.json({ status: "NO_USER" });
+    } else {
+      if (await bcrypt.compare(password, users[0].password)) {
+        res.json({ status: "USER_OK", lastLevel: users[0].last_level });
+      } else {
+        console.log(password, users[0])
+        res.json({ status: "PASS_INCORECT" });
+      } 
+    }
+  }).catch((err) => {
+    console.log(err);
+    res.json({ status: "ERROR" });
+  });
+  /*
   db_mysql
     .execute("SELECT password, last_level FROM user WHERE email = ?", [email])
     .then(async ([users]) => {
@@ -24,40 +41,35 @@ module.exports.areUserCredentialsValid = (req, res) => {
       console.log(err);
       res.json({ status: "ERROR" });
     });
+    */
 };
 
 module.exports.isEmailInUse = (req, res) => {
   const { email } = req.body;
-  db_mysql
-    .execute("SELECT id FROM user WHERE email = ?", [email])
-    .then(([users]) => {
+  
+  selectUserByEmail(email).then((users)=>{
       if (users.length > 0) {
         res.json({ isEmailAvailable: false });
       } else {
         res.json({ isEmailAvailable: true });
       }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+   }).catch((err) => {
+    console.log(err);
+  });
 };
 
 module.exports.addUser = async (req, res) => {
   const { email, name, password, level } = req.body;
   const salt = await bcrypt.genSalt();
   const hashPass = await bcrypt.hash(password, salt);
-  db_mysql
-    .execute(
-      "INSERT INTO user (email, name, password, last_level) VALUES (?, ?, ?, ?)",
-      [email, name, hashPass, level],
-    )
-    .then(() => {
-      res.json({ isUserAdded: true });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.json({ isUserAdded: false });
-    });
+
+  insertUser(email, hashPass, name, level).then(() => {
+    res.json({ isUserAdded: true });
+  })
+  .catch((err) => {
+    console.log(err);
+    res.json({ isUserAdded: false });
+  });
 };
 
 module.exports.resetPass = async (req, res) => {
