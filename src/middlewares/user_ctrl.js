@@ -13,7 +13,7 @@ module.exports.areUserCredentialsValid = (req, res) => {
       res.json({ status: "NO_USER" });
     } else {
       if (await bcrypt.compare(password, users[0].password)) {
-        res.json({ status: "USER_OK", lastLevel: users[0].last_level });
+        res.json({ status: "USER_OK", lastLevel: users[0].lastLevel });
       } else {
         console.log(password, users[0])
         res.json({ status: "PASS_INCORECT" });
