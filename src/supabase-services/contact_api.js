@@ -1,6 +1,9 @@
 const supabase = require("../../supabase");
 
 module.exports.insertMessage = async function(email, topic, message){
+  const x = await db.collection("message").add({email, topic,message});
+  
+ 
   const { data, error } = await supabase.from('message')
     .insert({ email_sender: email , topic, message })
     .select();
